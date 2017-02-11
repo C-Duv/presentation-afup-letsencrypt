@@ -4,10 +4,15 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>TODO: CSR, PKI puis Let's Encrypt</title>
+
+		<meta name="description" content="Présentation de Let's Encrypt à l'AFUP Lyon">
+		<meta name="author" content="DUVERGIER Claude">
+
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,27 +29,447 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					<h1><em>CSR</em>, <em>PKI</em> puis <em>Let's Encrypt</em></h1>
+
+					<div class="fragment">
+						<p>Histoire d'une migration de certificats classiques vers des certificats <em>Let's Encrypt</em><br />
+						(+ une <em>PKI</em> maison au passage)</p>
+					</div>
+
+					<p>Villeurbanne, le 02/02/2017</p>
+				</section>
+
+				<section data-background-image="./images/backgrounds/pexels-photo-30725.jpg" data-background-size="contain">
+					<h2>Le parcours</h2>
+					<ul>
+						<li>(Présentations)</li>
+						<li>(HTTPS et la confiance)</li>
+						<li>Les <em>CA</em>s</li>
+						<li>Une <em>PKI</em></li>
+						<li><em>Let's Encrypt</em> !</li>
+					</ul>
+				</section>
+
+				<section>
+					<section class="section-title" data-background-image="./images/backgrounds/silhouettes-68483_1920.jpg" data-background-size="contain">
+						<h2 style="margin-top: 2.5em;">Présentations</h2>
+					</section>
+
+					<section>
+						<h2>Moi</h2>
+
+						Administrateur systèmes et réseaux<br />
+						Développeur PHP <span class="fragment">5</span><span class="fragment">.4</span>
+					</section>
+
+					<section data-background-image="./images/backgrounds/hand-finger-indicate-the-wood-158769.jpeg" data-background-size="contain">
+						<h2>Vous ?</h2>
+					</section>
+				</section>
+
+				<section>
+					<section class="section-title" data-title="HTTP, TLS/SSL, confiance">
+						<h2>HTTP+SSL et la confiance</h2>
+					</section>
+
+					<section>
+						<h2><em>HTTPS</em> = <em>HTTP</em> + <em>SSL</em>/<em>TLS</em></h2>
+
+						<p>
+							<em>TLS</em> v1 &asymp; <em>SSL</em> v4<br />
+							(sur-)couche de sécurisation<br />
+						</p>
+						<p class="fragment">
+							Permet l'authentification (réciproque au besoin)<br />
+							La confidentialité et l'intégrité des données<br />
+						</p>
+					</section>
+
+					<section>
+						<h2><em>TLS</em> en action</h2>
+
+						<ol>
+							<li>C: initie la connexion <em>TLS</em></li>
+							<li>S: réponds avec son certificat</li>
+							<li>C: essaie de déchiffrer le certificat et le valide</li>
+							<li>C: génère une clé de session et l'envoie (chiffrée)</li>
+							<li>S et C chiffreront leur échanges avec cette clé</li>
+						</ol>
+					</section>
+				</section>
+
+				<section>
+					<section class="section-title" data-title="Les ACs">
+						<h2>Les Autorités de Certification (<em>AC</em>)</h2>
+					</section>
+
+					<section>
+						<blockquote>Une autorité de certification est un <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">tiers de confiance</strong> permettant d'authentifier l'identité des correspondants.</blockquote>
+						<blockquote>Une autorité de certification <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">délivre des certificats</strong> décrivant des identités numériques et met à disposition les moyens de <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">vérifier la validité</strong> des certificats qu'elle a fourni.</blockquote>
+						<em>(Source : <a href="https://fr.wikipedia.org/wiki/Autorit%C3%A9_de_certification" title="Article «&nbsp;Autorité de certification&nbsp;» sur Wikipédia France">Wikipedia</a>)</em>
+					</section>
+
+					<section>
+						<h2>Passez au <span class="smaller">(cadenas)</span> vert...</h2>
+
+						<ul class="fragment">
+							<li><em>DV</em>, <em>Domain Validation</em> (anonyme)</li>
+							<li>
+								<em>OV</em>, <em>Organization Validation</em> (nommé)<br />
+								<img data-src="./images/browser-bar-dv,ov.jpg" alt="Aperçu des niveaux DV et OV dans Firefox" />
+							</li>
+							<li class="fragment">
+								<em>EV</em>, <em>Extended Validation</em> (nommé, contrôlé)<br />
+								<img data-src="./images/browser-bar-ev.png" alt="Aperçu des niveaux DV et OV dans Firefox" />
+							</li>
+						</ul>
+						<p class="fragment">...Avec des billets verts</p>
+					</section>
+
+					<section data-background-image="./images/backgrounds/snail-1447233_1920.jpg" data-background-size="contain" data-state="dim-background">
+						<h2>Process standard</h2>
+
+						<ol>
+							<li>(Payer)</li>
+							<li>Générer une <em>CSR</em> :
+							<pre><code class="bash" data-trim>
+							openssl req -new -out webserver.csr \
+							    -key webserver.key -sha256
+							</code></pre></li>
+							<li>Coller la <em>CSR</em> sur l'interface de l'<em>AC</em></li>
+							<li>(Prouver la propriété du domaine)</li>
+							<li>
+								Récupérer le contenu du certificat <br />
+								et le coller sur le serveur
+							</li>
+						</ol>
+					</section>
+				</section>
+
+				<section>
+					<section class="section-title" data-title="Une PKI">
+						<h2>Une infra de gestion de clés</h2>
+
+						<p class="fragment"><em>Public Key Infrastructure</em> = Les logiciels de l'<em>AC</em></p>
+					</section>
+
+					<section>
+						<p>Libéré</p>
+						<p class="fragment">mais toujours occupé</p>
+						<p class="fragment">et isolé</p>
+					</section>
+				</section>
+
+				<section>
+					<section class="section-title" data-title="Let's Encrypt">
+						<h2><img data-src="./images/lets_encrypt-logo-lock.svg" style="height: 2em; vertical-align: bottom;" alt="Logo de Let's Encrypt" /> <em>Let's Encrypt</em></h2>
+
+						<ul>
+							<li>Une <em>AC</em></li>
+							<li>Sortie de beta en avril 2016</li>
+							<li>Certificats <em>DV</em> gratuits de 90 jours</li>
+							<li>Reconnue par les navigateurs</li>
+							<li>Simple d'utilisation grâce à <em>ACME</em></li>
+						</ul>
+					</section>
+
+					<section>
+						<h2><em>Automatic Certificate Management Environment</em></h2>
+
+						<p>
+							Framework client/serveur<br />
+							API REST<br />
+							Prévu pour des domaines<br />
+							1 compte client = une paire de clés publique/privée<br />
+						</p>
+					</section>
+
+					<section>
+						<h2>
+							Fonctionnement d'<em>ACME</em><br />
+							(demande de certificat)
+						</h2>
+
+						<ol>
+							<li>Client génère un CSR</li>
+							<li>Serveur propose différents <em>challenges</em></li>
+							<li>Client en releve un et informe le serveur</li>
+							<li>Serveur vérifie</li>
+							<li>Client télécharge certificat</li>
+						</ol>
+					</section>
+
+					<section>
+						<h2>Différentes validations (<em>DV</em>)</h2>
+						<ul>
+							<li>
+								HTTP (<em>http-01</em>) : Fichier<br />
+								<span class="smaller"><code>http://<span class="variable">{domain}</span>/.well-known/acme-challenge/<span class="variable">{token}</span></code></span>
+							</li>
+							<li>
+								DNS (<em>dns-01</em>) : Enregistrement <code>TXT</code><br />
+								<span class="smaller"><code>_acme-challenge.<span class="variable">{domain}</span>. 300 IN TXT "<span class="variable">{hash-auth-key}</span>"</code></span>
+							</li>
+							<li>
+								TLS + SNI (<em>tls-sni-02</em>) : Certificat auto-signé<br />
+								<span class="smaller">SAN 1 = <code><span class="variable">{hash-token}</span>.token.acme.invalid</code></span><br />
+								<span class="smaller">SAN 2 = <code><span class="variable">{hash-auth-key}</span>.ka.acme.invalid</code></span>
+							</li>
+							<li>
+								Manuelle (<em>oob-01</em>) : À faire à la main<br />
+								<span class="smaller">Pour les cas particuliers</span>
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Process idéal</h2>
+
+						<p>Avec un serveur web compatible <em>ACME</em>&nbsp;:</p>
+
+						<ol>
+							<li>Saisie du nom de domaine</li>
+							<li>Choix d'une <em>AC</em></li>
+							<li>(Paiement)</li>
+						</ol>
+						
+						<p class="fragment">
+							Le serveur web génère la clé, la <em>CSR</em>,<br />
+							contacte l'<em>AC</em>, récupère le certificat,<br />
+							l'installe et planifie les futures MAJ.<br />
+						</p>
+						<p class="fragment"><em>Profit!!</em></p>
+					</section>
+
+					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
+						<h2>Les commandes</h2>
+
+						<p>Installation (Debian)</p>
+						<pre><code class="bash" data-trim>
+						aptitude install certbot
+						</code></pre>
+
+						<div class="fragment">
+							<p>Validation par <em>http-01</em></p>
+							<pre class="fragment"><code class="bash" data-trim>
+							certbot certonly --standalone -d "foobar.example.com"
+							</code></pre>
+
+							<pre class="fragment"><code class="bash" data-trim>
+							certbot certonly --webroot \
+								-w /var/lib/letsencrypt/webroot/ -d "foobar.example.com"
+							</code></pre>
+						</div>
+					</section>
+
+					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
+						<h2>Configs serveur pour <code>webroot</code></h2>
+
+						<pre data-language="apache"><code data-trim>
+						Alias                           "/.well-known/acme-challenge/" \
+						    "/var/lib/letsencrypt/webroot/.well-known/acme-challenge/"
+						&lt;Directory "/var/lib/letsencrypt/webroot"&gt;
+						    Options None
+						    AllowOverride None
+						    ForceType text/plain
+						    Require all granted
+						    RedirectMatch 404 "^(?!/\.well-known/acme-challenge/[\w-]{43}$)"
+						&lt;/Directory&gt;
+						</code></pre>
+
+						<pre data-language="nginx"><code data-trim>
+						location ^~ /.well-known/acme-challenge/ {
+						    allow all;
+						    default_type "text/plain";
+						    root /var/lib/letsencrypt/webroot;
+						}
+						location = /.well-known/acme-challenge/ {
+						    return 404;
+						}
+						</code></pre>
+					</section>
+
+					<section>
+						<p>L'<em>AC</em> <em>Let's Encrypt</em> demande deux choses&nbsp;:<br />
+						<img data-src="./images/certbot-email.png" alt="E-mail de contact pour Let's Encrypt" />
+						<img data-src="./images/certbot-terms.png" alt="Acceptation des conditions de Let's Encrypt" /></p>
+						
+						<p class="fragment"><code>certbot</code> créer clés et certificats dans <code>/etc/letsencrypt/live/foobar.example.com/</code></p>
+					</section>
+
+					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
+						<h2>Renouvellement</h2>
+
+						Renouvellement en une commande&nbsp;:<br />
+						<pre class="fragment"><code class="bash" data-trim>
+						/usr/bin/certbot renew
+						</code></pre>
+						
+						<div class="fragment">
+							Automatisé c'est mieux&nbsp;:<br />
+							<pre><code class="bash" data-trim>
+							# Renew + reload serveur
+							cmd="/usr/bin/certbot \
+							         renew \
+							         --quiet --no-self-upgrade \
+							         --renew-hook \"/usr/sbin/service nginx reload\""
+
+							# Planification
+							echo "0 2 * * * root $cmd" > /etc/cron.d/certbot
+							</code></pre>
+						
+						<!-- <div class="fragment"> -->
+							<!-- Automatisé c'est mieux&nbsp;:<br /> -->
+							<!-- <pre><code class="bash" data-trim> -->
+							<!-- # Renew + reload serveur -->
+							<!-- cmd="/usr/bin/certbot renew \ -->
+							         <!-- --quiet --no-self-upgrade \ -->
+							     <!-- && /usr/sbin/service nginx reload \ -->
+							     <!-- > /dev/null" -->
+							
+							<!-- # Planification entre 2h et 3h -->
+							<!-- echo "\ -->
+							    <!-- $(expr $(od -An -N1 -i /dev/urandom)\%60 | tr -d ' ') 2 * * * \ -->
+							    <!-- root $cmd" \ -->
+							<!-- > /etc/cron.d/certbot -->
+							<!-- </code></pre> -->
+						<!-- </div> -->
+					</section>
+
+					<section>
+						<h2>Ils soutiennent <em>Let's Encrypt</em></h2>
+
+						<ul>
+							<li>Mozilla</li>
+							<li>Akamai</li>
+							<li>Cisco</li>
+							<li>EFF</li>
+							<li>OVH</li>
+							<li>Chrome</li>
+							<li>Gemalto</li>
+							<li>Facebook</li>
+							<li>Gandi </li>
+							<li>Automattic</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Conclusion</h2>
+
+						<div class="fragment">
+							<p><em>Let's Encrypt</em> c'est ...</p>
+
+							<ul>
+								<li>Gratuit</li>
+								<li>Simple (<em>fire and forget</em>)</li>
+								<li>
+									Utilisé par beaucoup<br />
+									(10 millions de certificats en sept. 2016)<br />
+									<span class="fragment">(et 10 de + deux mois plus tard)<br />
+								</li>
+								<li class="fragment">...et nous rapproche tous d'un web 100% chiffré</li>
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Questions ?</h2>
+					</section>
+				</section>
+
+				<section>
+					<h2>Merci</h2>
+
+					<div class="fragment">
+						<p>Pour poursuivre la découverte et vos questions ultérieures&nbsp;:</p>
+						<ul style="list-style-type: none;">
+							<li><img data-src="./images/pictos/home.png" />&nbsp; <a href="https://blog.claude.duvergier.fr">http<span class="highlight-red">s</span>://blog.claude.duvergier.fr</a><br /></li>
+							<li><img data-src="./images/pictos/github.png" />&nbsp; <a href="https://github.com/C-Duv/">C-Duv</a><br /></li>
+							<li><img data-src="./images/pictos/twitter.png" />&nbsp; <a href="https://twitter.com/C_Duv">@C_Duv</a></li>
+						</ul>
+					</div>
+				</section>
 			</div>
+		<footer>
+			<div class="title" />
+		</footer>
 		</div>
+
+		<!--
+		Images :
+		https://www.pexels.com/photo/left-index-finger-158769/
+		https://www.pexels.com/photo/dirt-road-path-wayside-nature-30725/
+		https://pixabay.com/fr/silhouettes-de-l-homme-groupe-68483/
+		https://pixabay.com/en/snail-obstacle-overcoming-will-1447233/
+		https://pixabay.com/en/code-programming-computer-data-1486361/
+		-->
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
+		<script src="lib/js/jquery.min.js"></script>
 
 		<script>
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
+				/* Dev:
+				controls: true,
+				slideNumber: true,
+				showNotes: true,
+				//*/
+
+				//* Prod:
+				controls: false,
+				slideNumber: false,
+				showNotes: false,
+				//*/
+
 				history: true,
+				width: 1024,
+				height: 768,
+
+				transition: 'none', // none/fade/slide/convex/concave/zoom
 
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
 				]
 			});
+
+			// MAJ du footer : Nom de partie dans le footer
+			updateFooter = function (event) {
+				var firstSectionSlide = $(event.currentSlide).parent("section").children("section:first.section-title")
+				if (firstSectionSlide.data('title')) {
+					$('body footer > div.title').text(firstSectionSlide.data('title'));
+					$('body footer > div.title').show();
+				}
+				else {
+					$('body footer > div.title').hide();
+				}
+			}
+			Reveal.addEventListener('ready', updateFooter);
+			Reveal.addEventListener('slidechanged', updateFooter);
+
+			// Synced fragment groups
+			Reveal.addEventListener( 'fragmentshown', function( event ) {
+				if (groupIdentifier = $(event.fragment).data('synced-fragment-group')) {
+					// Show other group members
+					var fragments = $(Reveal.getCurrentSlide()).find(".fragment[data-synced-fragment-group='" + groupIdentifier + "']:not(.current-fragment)");
+					$(fragments).addClass('visible');
+				}
+			} );
+			Reveal.addEventListener( 'fragmenthidden', function( event ) {
+				if (groupIdentifier = $(event.fragment).data('synced-fragment-group')) {
+					// Hide other group members
+					var fragments = $(Reveal.getCurrentSlide()).find(".fragment[data-synced-fragment-group='" + groupIdentifier + "']");
+					$(fragments).removeClass('visible');
+				}
+			} );
 		</script>
 	</body>
 </html>

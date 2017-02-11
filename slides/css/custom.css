@@ -1,0 +1,89 @@
+/* Removes default <img> style: */
+.reveal section img {
+    background:none;
+    border:none;
+    box-shadow:none;
+}
+.reveal section img {
+    vertical-align: middle;
+}
+
+.reveal blockquote {
+    quotes: "«\00A0" "\00A0»";
+}
+
+.reveal blockquote::before {
+    content: open-quote;
+}
+.reveal blockquote::after {
+    content: close-quote;
+}
+
+.reveal .smaller {
+    font-size: 0.5em;
+}
+
+.reveal .variable {
+    color: orange;
+}
+
+.reveal h1 {
+    font-size: 1.9em;
+}
+
+.reveal h2 {
+    color: #658dd3;
+}
+
+
+
+pre[data-language] code {
+    background-position: right bottom;
+    background-repeat: no-repeat;
+}
+
+pre[data-language="nginx"] code {
+    background-image: url("../images/nginx-n_logo.png");
+}
+
+pre[data-language="apache"] code {
+    background-image: url("../images/apache-feather-small.png");
+}
+
+
+html.dim-background .slide-background {
+    opacity: 0.4 !important;
+}
+
+footer {
+    bottom: 5px;
+    left: 5px;
+    position: absolute;
+    color: grey;
+    font-size: 42px;
+}
+
+footer div.title {
+    font-size: 0.5em;
+    font-style: italic;
+}
+
+footer div.title:before {
+    content: "«\00A0";
+}
+
+footer div.title:after {
+    content: "\00A0»";
+}
+
+.reveal .slides section.detailed {
+    background: black;
+}
+
+.speaker-notes hr {
+    border: none;
+    border-top: 1px dotted #f00;
+    height: 1px;
+    width: 60%;
+    margin: 0.2em 0px;
+}
