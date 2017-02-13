@@ -27,6 +27,10 @@
     color: orange;
 }
 
+.reveal .emphasizing {
+    color: orange;
+}
+
 .reveal h1 {
     font-size: 1.9em;
 }
@@ -51,8 +55,12 @@ pre[data-language="apache"] code {
 }
 
 
-html.dim-background .slide-background {
+html.dim-background .slide-background.present {
     opacity: 0.4 !important;
+}
+
+.reveal .slides section .highlight-red.visible  {
+    color: orange !important;
 }
 
 footer {
