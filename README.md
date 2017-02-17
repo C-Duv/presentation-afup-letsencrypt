@@ -17,8 +17,11 @@ Utilisation
 
 ### Consulter les diapos
 
-Ouvrir le fichier `slides/index.html`.
+Ouvrir le fichier [`slides/index.html`](./slides/index.html).
 C'est dans ce fichier que se trouve le contenu.
+
+Des notes additionnelles (antisèche) se trouvent dans le fichier `Détails
+supplémentaires sur Let's Encrypt.md`.
 
 ### Mode de rédaction (pour mise à jour)
 

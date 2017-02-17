@@ -38,6 +38,17 @@
 					</div>
 
 					<p>Lyon, le 15/02/2017</p>
+
+					<aside class="notes">
+						Bonsoir à tous et merci d'être venu.<br />
+						<hr />
+						Ce soir je vais vous raconter comment, en voulant sécuriser un nombre toujours grandissant d'applis internes HTTP "en clair" on a découvert les <em>PKI</em> et <em>Let's Encrypt</em>.<br />
+					</aside>
+				</section>
+
+				<section>
+					<p>Appuyez sur la touche <kbd>S</kbd> pour ouvrir les notes du présentateur (dans une nouvelle fenêtre).<br />
+					<p>Utilisez la touche <kbd>Espace</kbd> pour passer à la <em>slide</em> suivante.</p>
 				</section>
 
 				<section data-background-image="./images/backgrounds/pexels-photo-30725.jpg" data-background-size="contain">
@@ -50,11 +61,19 @@
 						<li>Une <em>PKI</em></li>
 						<li><em>Let's Encrypt</em> !</li>
 					</ul>
+
+					<aside class="notes">
+						Voici le programme, qui correspond également au cheminement suivi.<br />
+					</aside>
 				</section>
 
 				<section>
 					<section class="section-title" data-background-image="./images/backgrounds/silhouettes-68483_1920.jpg" data-background-size="contain">
 						<h2 style="margin-top: 2.5em;">Présentations</h2>
+
+						<aside class="notes">
+							Mais pour commencer, une petite phase de présentation.<br />
+						</aside>
 					</section>
 
 					<section>
@@ -62,16 +81,38 @@
 
 						Administrateur systèmes et réseaux<br />
 						Développeur PHP <span class="fragment">5</span><span class="fragment emphasizing">.4</span>
+
+						<aside class="notes">
+							Je suis administrateur systèmes et réseaux<br />
+							Je gère des serveurs sous Linux et une centaine de stations de travail.<br />
+							Mais je fais aussi du développement PHP
+							<hr />
+							en PHP 5
+							<hr />
+							5.4 :(
+						</aside>
 					</section>
 
 					<section data-background-image="./images/backgrounds/hand-finger-indicate-the-wood-158769.jpeg" data-background-size="contain">
 						<h2>Vous ?</h2>
+
+						<aside class="notes">
+							Petit recensement à main levée&nbsp;:<br />
+							Qui est développeur ?<br />
+							Qui s'occupe de près ou de loin d'une appli web ? (gardez les mains levées)<br />
+							Qui est en <em>full</em> SSL ?<br />
+							Même l'accès aux aux base de données ?<br />
+						</aside>
 					</section>
 				</section>
 
 				<section>
 					<section class="section-title" data-title="HTTP, TLS/SSL, confiance">
 						<h2>HTTP+SSL et la confiance</h2>
+
+						<aside class="notes">
+							Rapide présentation technique de l'HTTPS avant d'aborder le vif du sujet<br />
+						</aside>
 					</section>
 
 					<section>
@@ -89,6 +130,16 @@
 							Permet l'authentification (réciproque au besoin)<br />
 							La confidentialité et l'intégrité des données.<br />
 						</p>
+
+						<aside class="notes">
+							L'<em>HTTPS</em> c'est de l'<em>HTTP</em> avec une <strong>couche supplémentaire qui sécurise</strong> la couche application (ici l'<em>HTTP</em>)<br />
+							Elle peut être utilisée avec l'<em>IMAP</em> (ça donne l'<em>IMAPS</em>), avec l'<em>LDAP</em> (<em>LDAPS</em>), etc.<br />
+							<hr />
+							Le <em>TLS</em> est simplement le <strong>successeur</strong> de <em>SSL</em>.<br />
+							<hr />
+							L'<strong>authentification</strong> est apportée par un certificat <em>X.509</em>.<br />
+							Et la <strong>confidentialité</strong> est assurée par le chiffrement<br />
+						</aside>
 					</section>
 
 					<section>
@@ -102,12 +153,33 @@
 							<li>S et C chiffreront leur échanges avec cette clé</li>
 						</ol>
 						
+						<aside class="notes">
+							<em>TLS</em> comment ça fonctionne ?
+							<ol>
+								<li>Le client demande au serveur la <strong>mise en place</strong> une connexion <em>TLS</em>.</li>
+								<li>
+									Le serveur réponds avec son certificat (qui contient les informations de contact, sa clé publique et une signature numérique chiffrée).
+								</li>
+								<li>
+									Le client va <strong>tester toutes les Autorités de Certification</strong> qu'il connaît jusqu'à trouver celle qui <strong>valide</strong> la signature numérique reçue.
+								</li>
+								<li>Le client génère alors une <strong>clé de session</strong>, la chiffre avec la clé publique du serveur et lui envoie.</li>
+								<li>A partir de là, c'est cette clé qui sera utilisée.</li>
+							</ol>
+
+							On a d'abord une négociation protégée par <strong>clé publiques/privées</strong>.<br />
+							Puis les communications sont chiffrées par une <strong>clé secrète partagée</strong> propre à la session.<br />
+						</aside>
 					</section>
 				</section>
 
 				<section>
 					<section class="section-title" data-title="Pourquoi HTTPS ?">
 						<h2>Pourquoi vouloir de l'HTTPS ?</h2>
+
+						<aside class="notes">
+							Pourquoi s'embêter la vie à mettre en place tout ça ?<br />
+						</aside>
 					</section>
 
 					<section>
@@ -115,6 +187,15 @@
 							<li>Ne pas se restreindre (accès de partout)</li>
 							<li>Respecter l'utilisateur</li>
 						</ul>
+
+						<aside class="notes">
+							Dans notre cas, le but premier recherché était la <strong>sécurisation</strong> des communications.<br />
+							Car même si nos outils sont <strong>internes</strong>, on veut pouvoir les utiliser en <strong>déplacement</strong> à l'extérieur.<br />
+							Hormis les identifiants utilisateur, les informations qui s'y trouvent ne doivent pas être <strong>divulguées en dehors</strong> de l'entreprise (eg. infos sur nos clients).<br />
+							De manière générale c'est aussi un <strong>gage de respect</strong> envers vos utilisateurs.<br />
+							Vous, vous utilisez <code>telnet</code> pour accéder à vos serveurs ?<br />
+							À quoi bon <em>hasher</em> les mots de passe en base si c'est pour les transmettre en clair ?<br />
+						</aside>
 					</section>
 
 					<section>
@@ -126,6 +207,18 @@
 							Et les navigateurs&nbsp;<br />
 							<img data-src="./images/browser-password_over_http.png" alt="Aperçu d'un champ de mot de passe en HTTP:// dans Chromium" />
 						</div>
+
+						<p class="fragment">SEO ?</p>
+
+						<aside class="notes">
+							D'autre part, les grands acteurs du web y sont passés&nbsp;: c'est donc devenu tout à fait commun.<br />
+							Vos concurrents ont peut-être même déjà un site en HTTPS.<br />
+							<hr />
+							Mais surtout, les navigateurs poussent de plus en plus à l'utilisation de l'HTTPS.<br />
+							Au début c'était considéré comme un "plus", puis l'utilisation de formulaire en clair était simplement signalée, maintenant c'est clairement déconseillé.<br />
+							<hr />
+							Le moteur de recherche de Google a récemment officialisé sa position sur les sites en HTTPS : cela apporte un avantage par rapport à un site en HTTP, mais bien après de nombreux autres leviers tels qu'un site <em>responsive</em> ou <em>mobile-friendly</em><br />
+						</aside>
 					</section>
 
 					<section>
@@ -134,18 +227,38 @@
 						<div><img data-src="./images/browser_bar-invalid_certificate.png" alt="Aperçu d'un accès HTTPS:// avec certificat invalide dans Chromium" /></div>
 
 						<div class="fragment"><img data-src="./images/flame-1964066.svg" style="height: 5em; vertical-align: bottom;" alt="Flamme de feu" /></div>
+
+						<aside class="notes">
+							A l'opposé, mal configurer son serveur HTTPS (ou utiliser des certificats auto-signés) est contre-productif&nbsp;: les navigateurs dissuadent grandement l'utilisateur de poursuivre sa navigation.<br />
+							<hr />
+							Dans notre cas, avec nos outils internes, cela causerait de nombreux appels au support technique pour demander de l'aide.<br />
+						</aside>
 					</section>
 				</section>
 
 				<section>
 					<section class="section-title" data-title="Les ACs">
 						<h2>Les <span class="emphasizing">A</span>utorités de <span class="emphasizing">C</span>ertification (<em>AC</em>)</h2>
+
+						<aside class="notes">
+							J'ai évoqué les Autorités de Certification, on donc va rapidement voir ce que c'est<br />
+						</aside>
 					</section>
 
 					<section>
 						<blockquote>Une autorité de certification est un <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">tiers de confiance</strong> permettant d'authentifier l'identité des correspondants.</blockquote>
 						<blockquote>Une autorité de certification <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">délivre des certificats</strong> décrivant des identités numériques et met à disposition les moyens de <strong class="fragment highlight-red" data-synced-fragment-group="ca-wp-quote">vérifier la validité</strong> des certificats qu'elle a fourni.</blockquote>
 						<em>(Source&nbsp;: <a href="https://fr.wikipedia.org/wiki/Autorit%C3%A9_de_certification" title="Article «&nbsp;Autorité de certification&nbsp;» sur Wikipédia France">Wikipédia</a>)</em>
+
+						<aside class="notes">
+							La classique citation de Wikipédia, dont voici les termes les plus importants.<br />
+							<hr />
+							Le rôle d'une <em>AC</em> est similaire à celui d'un notaire, elle appose sa confiance sur un document (un certificat) en le signant (avec son propre certificat).<br />
+							Toute personne lui faisant confiance fera alors confiance au certificat signé.<br />
+							La confiance qu'on accorde à une <em>AC</em> est fonction de sa rigueur lors du contrôle des demandeurs et de la sécurité autour de sa clé privée.<br />
+							Il y a quelques mois, le laxisme d'une <em>AC</em> chinoise (WoSign) a amené certains éditeurs à lui retirer leur confiance en supprimant carrément son certificat de leur logiciels.<br />
+							A notre niveau, notre confiance en une <em>AC</em> est "embarquée" dans nos navigateurs et systèmes d'exploitation&nbsp;: on leur fait confiance pour y intégrer uniquement des <em>AC</em> sérieuses (choisissez donc bien vos logiciels).<br />
+						</aside>
 					</section>
 
 					<section>
@@ -167,6 +280,19 @@
 							</li>
 						</ul>
 						<p class="fragment">...Avec des billets verts</p>
+
+						<aside class="notes">
+							L'<em>AC</em> accorde sa confiance par seuils.<br />
+							<hr />
+							Niveau <em>DV</em>, validation du domaine, l'<em>AC</em> vérifie uniquement la capacité à utiliser le domaine&nbsp;: pas de nom de propriétaire dans le certificat (certificat anonyme).<br />
+							<hr />
+							En <em>OV</em>, validation de l'organisation, c'est comme <em>DV</em> mais l'<em>AC</em> vérifie l'identité du demandeur&nbsp;: le nom de propriétaire se retrouve dans le certificat.<br />
+							<hr />
+							Et le niveau <em>EV</em>, réservé aux entreprises et organisations, c'est de l'<em>OV</em> avec une vérification très approfondie du demandeur. Il faut fournir des documents officiels (genre extrait Kbis)&nbsp;: le nom de propriétaire se retrouve dans la barre d'adresse du navigateur.<br />
+							<hr />
+							Le prix varie (par exemple, de 130€ à 250€ par an) parce qu'ils vous font payer leur travail de contrôle d'identité.<br />
+							Mais en échange la protection en cas de transaction frauduleuse augmente (jusqu'à 1,5 millions de $).<br />
+						</aside>
 					</section>
 
 					<section data-background-image="./images/backgrounds/snail-1447233_1920.jpg" data-background-size="contain" data-state="dim-background">
@@ -186,6 +312,19 @@
 								et le coller sur le serveur
 							</li>
 						</ol>
+
+						<aside class="notes">
+							Voici le <strong>processus standard</strong> pour obtenir un certificat auprès d'une <em>AC</em><br />
+							<ol>
+								<li>Généralement on commence par <strong>payer</strong>.</li>
+								<li>Il faut ensuite générer la <em>CSR</em>&nbsp;: c'est un document <strong>éphémère</strong> contenant toutes les informations du <strong>futur certificat</strong>.</li>
+								<li>On la donne à l'<em>AC</em>.</li>
+								<li>On se plie à ses <strong>règles</strong> de vérification.</li>
+								<li>Et on récupère enfin le certificat.</li>
+							</ol>
+							Cette opération prends de 1 à 3 heures (d'après <em>Let's Encrypt</em>)&nbsp;: selon qu'on ait la <strong>carte bancaire</strong> à portée de main, le temps de se souvenir des <strong>commandes exactes</strong>, de <strong>récupérer</strong> les fichiers, de les <strong>copier</strong> sur le serveur, etc.<br />
+							Heureusement, qu'on avait que deux certificats à renouveler&nbsp;: c'était gérable.<br />
+						</aside>
 					</section>
 				</section>
 
@@ -194,12 +333,32 @@
 						<h2>Une infra de gestion de clés</h2>
 
 						<p class="fragment"><em><span class="emphasizing">P</span>ublic <span class="emphasizing">K</span>ey <span class="emphasizing">I</span>nfrastructure</em> = Les logiciels de l'<em>AC</em></p>
+
+						<aside class="notes">
+							Nous, on voulait <strong>sécuriser</strong> nos outils internes mais on ne voulait <strong>pas y mettre beaucoup</strong>.<br />
+							On s'est donc monté une <strong><em>PKI</em> maison</strong> et donc notre <strong>propre <em>AC</em></strong>.<br />
+							<hr />
+							Le terme <em>PKI</em> désigne <strong>l'ensemble des logiciels</strong> utilisés par une <em>AC</em> pour générer, délivrer et révoquer des certificats.<br />
+						</aside>
 					</section>
 
 					<section>
 						<p>Libérés</p>
 						<p class="fragment">mais toujours occupés</p>
 						<p class="fragment">et isolés</p>
+
+						<aside class="notes">
+							C'était une bonne solution.<br />
+							Une <em>PKI</em> maison ne <strong>coûte pas</strong> grand chose&nbsp;: juste un peu de <strong>temps de configuration</strong>.<br />
+							Et on génère les certificats que l'on veut, même pour des <strong>domaines internes</strong>.<br />
+							<hr />
+							Par contre les <strong>étapes</strong> de génération restent globalement les même.<br />
+							Et il faut toujours penser aux <strong>renouvellements</strong>.
+							Oui, c'est pas parce qu'on a notre propre <em>AC</em> qu'on va générer des certificats valables 10 ans.<br />
+							<hr />
+							Le point <strong>négatif</strong> c'est qu'on se retrouve avec des certificats signés par une <strong><em>AC</em> inconnue</strong>, la notre,<br />
+							et l'obligation d'ajouter le certificat <strong>racine</strong> dans tous les ordinateurs du parc.<br />
+						</aside>
 					</section>
 				</section>
 
@@ -214,17 +373,35 @@
 							<li>Reconnue par les navigateurs</li>
 							<li>Simple d'utilisation grâce à <em>ACME</em></li>
 						</ul>
+
+						<aside class="notes">
+							C'est là qu'arrive <em>Let's Encrypt</em>.<br />
+							C'est une <strong>Autorité de Certification</strong> délivrant des certificats <em>DV</em>.<br />
+							Gérée par une entreprise américaine <strong>"d'intérêt pour la société"</strong> (<em>public-benefit corporation</em>).<br />
+							Tant que vous n'êtes pas sur du Windows XP SP2, un Blackberry 10 ou de l'Android 2.2 ça passe.<br />
+							Son certificat est signé par une <em>AC</em> connue des navigateurs.<br />
+							Et il est même directement intégré dans Firefox depuis la version 50.<br />
+							Sa simplicité repose sur l'<strong>automatisme</strong> d'<em>ACME</em>.<br />
+						</aside>
 					</section>
 
 					<section>
 						<h2><em><span class="emphasizing">A</span>utomatic <span class="emphasizing">C</span>ertificate <span class="emphasizing">M</span>anagement <span class="emphasizing">E</span>nvironment</em></h2>
 
 						<p>
-							Framework client/serveur<br />
+							Framework ouvert client/serveur<br />
 							API REST<br />
 							Prévu pour des domaines<br />
 							1 compte client = une paire de clés publique/privée<br />
 						</p>
+
+						<aside class="notes">
+							<em>ACME</em>, est un <strong>framework</strong> automatisant la livraison de certificat via une <strong>API REST</strong>.<br />
+							Il n'est <strong>pas réservé</strong> à <em>Let's Encrypt</em>.<br />
+							Le client <em>ACME</em> est sur votre serveur, le serveur <em>ACME</em> est du côté de l'<em>AC</em>.<br />
+							Il délivre des certificats pour des <strong>domaines</strong>.<br />
+							La clé <strong>privée signe</strong> tous les messages envoyés par le client <em>ACME</em>.<br />
+						</aside>
 					</section>
 
 					<section>
@@ -240,6 +417,14 @@
 							<li>Serveur vérifie</li>
 							<li>Client télécharge certificat</li>
 						</ol>
+
+						<aside class="notes">
+							Le fonctionnement d'<em>ACME</em> est <strong>similaire</strong> à ce qu'on a vu plus tôt.<br />
+							Le client <em>ACME</em> (logiciel) doit toujours générer une <em>CSR</em>.<br />
+							Chaque <em>challenge</em> proposés par le serveur <em>ACME</em> correspond à une <strong>méthode de validation</strong> (par HTTP, par DNS, etc. que nous verrons juste après).<br />
+							Le client choisi et résout un <em>challenge</em> puis le signale au serveur qui va vérifier de son côté avant de fournir le certificat.<br />
+							<em>ACME</em> ne gère <strong>pas l'aspect sécurité</strong> de la <em>CSR</em> (la longueur de clé, l'algorithme de chiffrement, etc.), c'est une chose que l'<em>AC</em> doit faire de son côté.<br />
+						</aside>
 					</section>
 
 					<section>
@@ -263,6 +448,20 @@
 								<span class="smaller">Pour les cas particuliers</span>
 							</li>
 						</ul>
+
+						<aside class="notes">
+							Une validation est une vérification par le serveur <em>ACME</em> de la "réponse" au <em>challenge</em>.<br />
+							Avec <em>http-01</em>, <em>ACME</em> vérifie notre capacité à mettre un fichier donné à un <strong>emplacement précis</strong>.<br />
+							Le serveur <em>ACME</em> contactera une des adresses IP correspondant au domaine à valider (gare aux architectures avec load-balancers).<br />
+							<br />
+							Avec <em>dns-01</em>, <em>ACME</em> vérifie notre capacité à <strong>mettre à jour</strong> une zone DNS.<br />
+							<br />
+							<em>tls-sni-02</em>, c'est <strong>similaire à <em>http-01</em></strong> mais là, ça passe par un serveur HTTPS avec du <em>SNI</em>.<br />
+							Via une certificat auto-signé comportant 2 <em>SAN</em> (<code>subjectAlternativeNames</code>).<br />
+							C'est <strong>incompatible avec certaines plateformes</strong> d'hébergement qui se reposent sur le paramètre <em>SNI</em> pour router leur trafic client.<br />
+							<br />
+							<em>oob-01</em>, gérera les cas particuliers demandant une <strong>intervention manuelle</strong>.<br />
+						</aside>
 					</section>
 
 					<section>
@@ -282,6 +481,18 @@
 							l'installe et planifie les futures MAJ.<br />
 						</p>
 						<p class="fragment"><em>Profit!</em></p>
+
+						<aside class="notes">
+							Dans un monde idéal où le framework <em>ACME</em> serait répandu jusqu'aux serveurs web on aurait le fonctionnement suivant&nbsp;:<br />
+							<ol>
+								<li>Le serveur web demande à l'opérateur le nom de domaine.</li>
+								<li>L'opérateur choisit une <em>AC</em> (<em>Let's Encrypt</em> ou autre).</li>
+								<li>Éventuellement, des informations de paiement sont demandées.<hr /></li>
+								<li>Le serveur web s'occupe du reste.</li>
+							</ol>
+							<hr />
+							Et c'est tout.
+						</aside>
 					</section>
 
 					<section>
@@ -297,6 +508,10 @@
 							<li><em>Gandi</em>, <em>OVH</em></li>
 							<li><em>RFC2136</em> (<em>DNS UPDATE</em>)</li>
 						</ul>
+
+						<aside class="notes">
+							En fait, ça existe déjà&nbsp;: le serveur web <em>Caddy</em> fait tout ça et propose même du <strong><em>On-Demand TLS</em></strong> où le certificat est généré à <strong>l'arrivée d'une requête HTTPS</strong>.
+						</aside>
 					</section>
 
 					<section>
@@ -308,6 +523,11 @@
 							<li>Des <em>Control Panel</em></li>
 							<li>Des solutions d'auto-hébergement (e-mails, fichiers, etc.)</li>
 						</ul>
+
+						<aside class="notes">
+							Notons également l'existence de <code>amphp/aerys</code>, un serveur HTTP 1 et 2 écrit en PHP 7.<br />
+							Et diverses autres applications qui intègrent aussi des clients <em>ACME</em>.<br />
+						</aside>
 					</section>
 
 					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
@@ -331,6 +551,18 @@
 							    -d "bar.example.com"
 							</code></pre>
 						</div>
+
+						<aside class="notes">
+							On passe enfin à un peu de commandes.<br />
+							Un package du client <em>ACME</em> officiel existe pour la plupart des distribution Unix.<br />
+							Mais il y a aussi des clients PHP, Python, Node.js, etc.<br />
+							<hr />
+							Voici un exemple de validation par HTTP.<br />
+							<hr />
+							Avec le plugin <code>standalone</code>, <code>certbot</code> démarre un serveur Web sur le port 80.<br />
+							<hr />
+							Avec le plugin <code>webroot</code>, il place le fichier de <em>challenge</em> dans un dossier précis déjà configuré sur votre serveur Web.<br />
+						</aside>
 					</section>
 
 					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
@@ -358,6 +590,11 @@
 						    return 404;
 						}
 						</code></pre>
+
+						<aside class="notes">
+							Bien qu'il existe <strong>directement</strong> des plugins pour <em>Apache</em> et <em>Nginx</em>, il est <strong>plus sûr</strong> et tout <strong>aussi efficace</strong> d'utiliser <code>webroot</code> avec la configuration qui va bien.<br />
+							Quelqu'un veut la version Tomcat ?<br />
+						</aside>
 					</section>
 
 					<section>
@@ -381,6 +618,13 @@
 						</code></pre>
 
 						<p class="fragment"><code>certbot</code> crée clés et certificats dans <code>/etc/letsencrypt/live/foo.example.com/</code></p>
+
+						<aside class="notes">
+							A la première génération de certificat, le client demande une adresse e-mail et l'acceptation des conditions d'utilisation de <em>Let's Encrypt</em>.<br />
+							<hr />
+							Si tout va bien, le certificat est téléchargé.<br />
+							Ensuite c'est <strong>à vous de</strong> configurer votre serveur (HTTP, FTP, LDAP, etc.).<br />
+						</aside>
 					</section>
 
 					<section>
@@ -429,10 +673,16 @@
 							Creating CSR: /etc/letsencrypt/csr/0001_csr-certbot.pem
 							</code></pre>
 						</div>
+
+						<aside class="notes">
+							Ici on utilise le plugin <code>manual</code> de <code>certbot</code> pour effectuer une validation DNS à la main.<br />
+							<hr />
+							<code>certbot</code> va nous guider en indiquant quel enregistrement <code>TXT</code> créer et attendre notre <em>go</em> pour poursuivre (contacter le serveur <em>ACME</em>).<br />
+						</aside>
 					</section>
 
 					<section>
-						<h2>Validation DNS auto (OVH)</h2>
+						<h2>Validation DNS auto (<em>OVH</em>)</h2>
 
 						<p>Avec le client <code>Neilpang/acme.sh</code></p>
 						
@@ -454,6 +704,17 @@
 						</div>
 						
 						<p class="fragment">Gère&nbsp;: <em>Alwaysdata</em>, <em>Cloudflare</em>, <em>GoDaddy</em>, <em>AWS Route 53</em>, <em>DigitalOcean</em>, ...</p>
+
+						<aside class="notes">
+							Le client <code>certbot</code> ne gère pas nativement la validation DNS automatique.<br />
+							Il faut passer par d'autres clients (ici <code>acme.sh</code>) et avoir un registraire qui dispose d'une API (ici <em>OVH</em>).<br />
+							<hr />
+							Premier lancement pour configurer l'API <em>OVH</em>.<br />
+							<hr />
+							Ensuite la commande est aussi simple qu'avec <code>certbot</code>.<br />
+							<hr />
+							<code>acme.sh</code> gère également d'autres fournisseurs.<br />
+						</aside>
 					</section>
 
 					<section data-background-image="./images/backgrounds/code-1486361_1920.jpg" data-background-size="contain" data-state="dim-background">
@@ -479,6 +740,13 @@
 							    root $cmd" \
 							    > /etc/cron.d/certbot
 							</code></pre>
+
+						<aside class="notes">
+							<code>certbot</code> garde une liste des certificats qu'il a généré.<br />
+							Avec la commande <code>renew</code> on peut demander le renouvellement de tous les certificats arrivant à expiration (dans les 30 jours).<br />
+							<hr />
+							Mais le faire automatiquement c'est mieux.<br />
+						</aside>
 					</section>
 
 					<section>
@@ -496,6 +764,16 @@
 							<li>Gandi </li>
 							<li>Automattic</li>
 						</ul>
+
+						<aside class="notes">
+							<em>Let's Encrypt</em> est sponsorisé par diverses sociétés et organisations.<br />
+							<em>Akamai</em> est fournisseur de serveurs de cache.<br />
+							<em>EFF</em>, une ONG internationale qui défend la liberté d'expression sur Internet.<br />
+							<em>Gemalto</em> est fabricant de cartes <em>SIM</em>.<br />
+							<em>Gandi</em>, qui est revendeur de certificats classiques.<br />
+							<em>Automattic</em> est le développeur de <em>WordPress</em>, <em>Gravatar</em> et <em>Akismet</em>.<br />
+							Et <em>OVH</em>, qui offre même un certificat <em>Let's Encrypt</em> dans ses offres d'hébergement Web.<br />
+						</aside>
 					</section>
 				</section>
 
@@ -524,6 +802,17 @@
 								<li class="fragment">...nous rapproche tous d'un web 100% chiffré</li>
 							</ul>
 						</div>
+
+						<aside class="notes">
+							Dans notre cas, notre <em>PKI</em> nous a permit de <strong>sécuriser des outils internes</strong> qui étaient utilisés en déplacement (mode nomade).<br />
+							Puis, <em>Let's Encrypt</em> nous a permit d'<strong>ouvrir vers l'extérieur</strong> certains de ces outils rien sans débourser.<br />
+							D'ailleurs le site <strong>web de la société</strong> y est passé.<br />
+							Et on réfléchit à <strong>y migrer</strong> nos 2 certificats classiques.<br />
+							<hr />
+							(lire liste)
+							<hr />
+							L'HTTPS progresse&nbsp;: fin janvier 2017, plus de la moitié des pages chargées par Firefox l'étaient en HTTPS.<br />
+						</aside>
 					</section>
 				</section>
 

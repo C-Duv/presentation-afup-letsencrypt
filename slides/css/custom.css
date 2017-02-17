@@ -8,6 +8,18 @@
     vertical-align: middle;
 }
 
+.reveal kbd {
+    padding: 0em 0.4em;
+    border: 3px solid #AAA;
+    font-family: monospace;
+    background-color: #F0F0F0;
+    color: #202020;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 0px 0.1em;
+    white-space: nowrap;
+}
+
 .reveal blockquote {
     quotes: "«\00A0" "\00A0»";
 }
